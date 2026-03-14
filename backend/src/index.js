@@ -1,0 +1,43 @@
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+require('dotenv').config();
+
+const authRoutes = require('./routes/auth');
+const sociosRoutes = require('./routes/socios');
+const pagosRoutes = require('./routes/pagos');
+const asistenciasRoutes = require('./routes/asistencias');
+const movimientosRoutes = require('./routes/movimientosRoutes');
+const ejerciciosRoutes = require('./routes/ejercicios');
+const rutinasRoutes = require('./routes/rutinas');
+const noticiasRoutes = require('./routes/noticias');
+const planesRoutes = require('./routes/planes');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// ── Servir imágenes de ejercicios como archivos estáticos ──────────────────
+// Accesibles desde: http://localhost:3000/ejercicios-img/nombre.gif
+app.use('/ejercicios-img', express.static(path.join(__dirname, '../uploads/ejercicios')));
+// ──────────────────────────────────────────────────────────────────────────
+
+app.use('/auth', authRoutes);
+app.use('/socios', sociosRoutes);
+app.use('/pagos', pagosRoutes);
+app.use('/asistencias', asistenciasRoutes);
+app.use('/movimientos', movimientosRoutes);
+app.use('/ejercicios', ejerciciosRoutes);
+app.use('/rutinas', rutinasRoutes);
+app.use('/noticias', noticiasRoutes);
+app.use('/api/planes', planesRoutes);
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Server error' });
+});
+
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

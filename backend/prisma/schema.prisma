@@ -1,0 +1,192 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  dni       String   @unique
+  nombre    String
+  email     String   @unique
+  password  String
+  rol       Role     @default(SOCIO)
+  createdAt DateTime @default(now())
+  socioId   Int?     @unique
+  socio     Socio?   @relation(fields: [socioId], references: [id])
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  SOCIO
+}
+
+model Plan {
+  id          Int      @id @default(autoincrement())
+  codigo      String   @unique
+  nombre      String
+  diasSemana  Int?
+  precio      Float
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  socios      Socio[]  @relation("PlanActual")
+  sociosPend  Socio[]  @relation("PlanPendiente")
+}
+
+model Socio {
+  id            Int      @id @default(autoincrement())
+  nombre        String
+  apellido      String
+  email         String   @unique
+  password      String
+  telefono      String?
+  planId        Int?
+  planPendienteId Int?
+  plan          Plan?    @relation("PlanActual", fields: [planId], references: [id])
+  planPendiente Plan?    @relation("PlanPendiente", fields: [planPendienteId], references: [id])
+  role          String   @default("SOCIO")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  pagos         Pago[]
+  asistencias   Asistencia[]
+  rutinas       SocioRutina[]
+  user          User?
+
+  @@map("socios")
+}
+
+enum Estado {
+  ACTIVO
+  VENCIDO
+}
+
+model Pago {
+  id          Int         @id @default(autoincrement())
+  socioId     Int
+  socio       Socio       @relation(fields: [socioId], references: [id])
+  monto       Float
+  fecha       DateTime    @default(now())
+  vencimiento DateTime
+  estado      PagoEstado  @default(PENDIENTE)
+  movimiento  Movimiento?
+
+  @@map("pagos")
+}
+
+enum PagoEstado {
+  PAGADO
+  PENDIENTE
+  VENCIDO
+}
+
+model Asistencia {
+  id      Int      @id @default(autoincrement())
+  socioId Int
+  socio   Socio    @relation(fields: [socioId], references: [id])
+  fecha   DateTime @default(now())
+  semana  Int
+  anio    Int
+  alerta  Boolean  @default(false)
+
+  @@map("asistencias")
+}
+
+model Movimiento {
+  id          Int            @id @default(autoincrement())
+  tipo        TipoMovimiento
+  monto       Float
+  descripcion String
+  categoria   String
+  fecha       DateTime       @default(now())
+  pagoId      Int?           @unique
+  pago        Pago?          @relation(fields: [pagoId], references: [id])
+}
+
+enum TipoMovimiento {
+  INGRESO
+  EGRESO
+}
+
+model Ejercicio {
+  id                Int               @id @default(autoincrement())
+  nombre            String
+  descripcion       String?
+  grupoMuscular     String
+  imageUrl          String?
+  wgerBaseId        Int?
+  rutinasEjercicios RutinaEjercicio[]
+  createdAt         DateTime          @default(now())
+
+  @@map("ejercicios")
+}
+
+model Rutina {
+  id            Int               @id @default(autoincrement())
+  nombre        String
+  descripcion   String?
+  socios        SocioRutina[]
+  ejercicios    RutinaEjercicio[]
+  fmTemplateId  Int?              @unique
+  creadoEn      DateTime          @default(now())
+  actualizadoEn DateTime          @updatedAt
+
+  @@map("rutinas")
+}
+
+model SocioRutina {
+  id         Int      @id @default(autoincrement())
+  socioId    Int
+  rutinaId   Int
+  socio      Socio    @relation(fields: [socioId], references: [id], onDelete: Cascade)
+  rutina     Rutina   @relation(fields: [rutinaId], references: [id], onDelete: Cascade)
+  asignadaEn DateTime @default(now())
+
+  @@unique([socioId, rutinaId])
+  @@map("socio_rutinas")
+}
+
+model RutinaEjercicio {
+  id           Int       @id @default(autoincrement())
+  rutinaId     Int
+  rutina       Rutina    @relation(fields: [rutinaId], references: [id], onDelete: Cascade)
+  ejercicioId  Int
+  ejercicio    Ejercicio @relation(fields: [ejercicioId], references: [id])
+  series       Int
+  repeticiones String
+  diaSemana    DiaSemana
+  bloque       String?
+  orden        Int       @default(0)
+  notas        String?
+
+  @@map("rutina_ejercicios")
+}
+
+enum DiaSemana {
+  LUNES
+  MARTES
+  MIERCOLES
+  JUEVES
+  VIERNES
+  SABADO
+  DOMINGO
+}
+
+model Noticia {
+  id        Int      @id @default(autoincrement())
+  titulo    String
+  contenido String   @db.Text
+  imagen    String
+  estado    String   @default("BORRADOR")
+  fecha     DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("noticias")
+}
