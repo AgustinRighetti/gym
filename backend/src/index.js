@@ -14,7 +14,13 @@ const noticiasRoutes = require('./routes/noticias');
 const planesRoutes = require('./routes/planes');
 
 const app = express();
-app.use(cors());
+
+// Configuración de CORS - permitir requests desde Vercel
+app.use(cors({
+  origin: ['https://gym-frontend-nine-ebon.vercel.app', 'http://localhost:5173'],
+  credentials: true
+}));
+
 app.use(express.json());
 
 // ── Servir imágenes de ejercicios como archivos estáticos ──────────────────
