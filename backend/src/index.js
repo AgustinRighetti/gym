@@ -18,9 +18,7 @@ app.use(cors());
 app.use(express.json());
 
 // ── Servir imágenes de ejercicios como archivos estáticos ──────────────────
-// Accesibles desde: http://localhost:3000/ejercicios-img/nombre.gif
 app.use('/ejercicios-img', express.static(path.join(__dirname, '../uploads/ejercicios')));
-// ──────────────────────────────────────────────────────────────────────────
 
 app.use('/auth', authRoutes);
 app.use('/socios', sociosRoutes);
@@ -37,7 +35,13 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Server error' });
 });
 
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Solo iniciar servidor si NO está en Vercel
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 4000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+// Exportar para Vercel
+module.exports = app;
