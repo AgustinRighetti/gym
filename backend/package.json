@@ -2,10 +2,10 @@
   "name": "gym-backend",
   "version": "1.0.0",
   "main": "src/index.js",
-  "scripts": {
-    "start": "node src/index.js",
-    "build": "prisma generate && prisma db push --accept-data-loss"
-  },
+ "scripts": {
+  "start": "prisma db push --accept-data-loss && node src/index.js",
+  "build": "prisma generate"
+},
   "dependencies": {
     "@prisma/client": "^5.22.0",
     "prisma": "^5.22.0",
