@@ -43,7 +43,7 @@ model Socio {
   id            Int      @id @default(autoincrement())
   nombre        String
   apellido      String
-  email         String   @unique
+  email         String?   @unique
   password      String
   telefono      String?
   planId        Int?
