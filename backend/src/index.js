@@ -15,11 +15,8 @@ const planesRoutes = require('./routes/planes');
 
 const app = express();
 
-// Configuración de CORS - permitir todos los orígenes temporalmente
-app.use(cors({
-  origin: '*',
-  credentials: true
-}));
+// Configuración de CORS - permitir todos los orígenes
+app.use(cors());
 
 app.use(express.json());
 
