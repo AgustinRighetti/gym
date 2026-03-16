@@ -26,6 +26,28 @@ async function register(req, res) {
     const hashed = await bcrypt.hash(password, 10);
     const userRole = rol && rol === 'ADMIN' ? 'ADMIN' : 'SOCIO';
 
+    // Buscar el plan si se proporcionó un código de plan
+    let planRecord = null;
+    if (plan) {
+      planRecord = await prisma.plan.findUnique({ where: { codigo: plan } });
+    }
+
+    // Crear el socio primero si el rol es SOCIO
+    let socio = null;
+    if (userRole === 'SOCIO') {
+      socio = await prisma.socio.create({
+        data: {
+          nombre,
+          apellido: apellido || '',
+          email: email || null,
+          password: hashed,
+          telefono: telefono || null,
+          planId: planRecord ? planRecord.id : null,
+        }
+      });
+    }
+
+    // Crear el usuario y conectar con el socio si existe
     const user = await prisma.user.create({
       data: {
         dni,
@@ -33,20 +55,9 @@ async function register(req, res) {
         email: email || null,
         password: hashed,
         rol: userRole,
+        socioId: socio ? socio.id : null,
       },
     });
-
-    if (userRole === 'SOCIO') {
-      const socioData = {
-        usuarioId: user.id,
-        nombre,
-        apellido: apellido || '',
-        telefono: telefono || null,
-        plan: plan || 'UN_DIA',
-      };
-
-      await prisma.socio.create({ data: socioData });
-    }
 
     const token = jwt.sign(
       { userId: user.id, rol: user.rol, dni: user.dni },

@@ -11,7 +11,7 @@ model User {
   id        Int      @id @default(autoincrement())
   dni       String   @unique
   nombre    String
-  email     String   @unique
+  email     String?   @unique
   password  String
   rol       Role     @default(SOCIO)
   createdAt DateTime @default(now())
