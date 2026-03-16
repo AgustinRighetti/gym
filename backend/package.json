@@ -2,12 +2,13 @@
   "name": "gym-backend",
   "version": "1.0.0",
   "main": "src/index.js",
- "scripts": {
-  "start": "node src/index.js",
-  "build": "npx prisma generate && npx prisma db push --accept-data-loss"
-},
+  "scripts": {
+    "start": "node src/index.js",
+    "build": "prisma generate && prisma db push --accept-data-loss"
+  },
   "dependencies": {
     "@prisma/client": "^5.22.0",
+    "prisma": "^5.22.0",
     "axios": "^1.13.6",
     "bcrypt": "^5.1.0",
     "cloudinary": "^2.9.0",
@@ -18,7 +19,6 @@
     "multer": "^2.1.1"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1",
-    "prisma": "^5.22.0"
+    "nodemon": "^3.0.1"
   }
 }
