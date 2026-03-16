@@ -15,9 +15,9 @@ const planesRoutes = require('./routes/planes');
 
 const app = express();
 
-// Configuración de CORS - permitir requests desde Vercel
+// Configuración de CORS - permitir todos los orígenes temporalmente
 app.use(cors({
-  origin: ['https://gym-frontend-nine-ebon.vercel.app', 'http://localhost:5173'],
+  origin: '*',
   credentials: true
 }));
 
