@@ -15,7 +15,7 @@ const planesRoutes = require('./routes/planes');
 
 const app = express();
 
-// Configuración de CORS - permitir todos los orígenes
+// Configuración de CORS
 app.use(cors());
 
 app.use(express.json());
@@ -38,13 +38,10 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Server error' });
 });
 
-// Solo iniciar servidor si NO está en Vercel
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 4000;
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-}
+// Iniciar servidor siempre
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
-// Exportar para Vercel
 module.exports = app;
