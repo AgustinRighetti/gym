@@ -25,25 +25,29 @@ async function createPago(req, res) {
       return res.status(400).json({ message: 'Falta socioId' });
     }
 
-    let socio = await prisma.socio.findUnique({ where: { id: socioId } });
+    // Incluir el plan y planPendiente en la consulta
+    let socio = await prisma.socio.findUnique({
+      where: { id: socioId },
+      include: { plan: true, planPendiente: true },
+    });
     if (!socio) {
       return res.status(404).json({ message: 'Socio no encontrado' });
     }
 
-    // Si hay plan pendiente, aplicarlo antes de procesar el pago
-    if (socio.planPendiente) {
+    // Si hay plan pendiente, aplicarlo
+    if (socio.planPendienteId) {
       socio = await prisma.socio.update({
         where: { id: socioId },
         data: {
-          plan: socio.planPendiente,
-          planPendiente: null,
-          planPendienteFecha: null,
+          planId: socio.planPendienteId,
+          planPendienteId: null,
         },
+        include: { plan: true },
       });
     }
 
-    // Calcular monto según el plan activo (ya actualizado si había pendiente)
-    const montoFinal = monto ?? PLAN_MONTOS[socio.plan] ?? 0;
+    // Calcular monto según el código del plan
+    const montoFinal = monto ?? (socio.plan ? PLAN_MONTOS[socio.plan.codigo] : 0);
 
     const fecha = new Date();
     const vencimiento = new Date(fecha);
@@ -57,12 +61,6 @@ async function createPago(req, res) {
         vencimiento,
         estado: 'PAGADO',
       },
-    });
-
-    // Actualizar estado del socio a ACTIVO
-    await prisma.socio.update({
-      where: { id: socioId },
-      data: { estado: 'ACTIVO' },
     });
 
     // Crear movimiento de ingreso automático
