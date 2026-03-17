@@ -141,7 +141,6 @@ export default function Landing() {
       try {
         const response = await fetch(`${BASE}/noticias`);
         const data = await response.json();
-        // Solo las últimas 6 noticias publicadas
         setNoticias(data.slice(0, 6));
       } catch (err) {
         console.error("Error al cargar noticias:", err);
@@ -156,6 +155,16 @@ export default function Landing() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
+  // Bloquear scroll del body cuando el menú mobile está abierto
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
+
   const formatPrice = (p) => `$${p.toLocaleString("es-AR")}`;
   const scrollTo = (id) => { document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }); setMenuOpen(false); };
 
@@ -165,15 +174,33 @@ export default function Landing() {
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
+
+        /* NAV */
         .nav-link { font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; font-size: 1rem; color: #aaa; text-decoration: none; transition: color 0.2s; cursor: pointer; }
         .nav-link:hover { color: #FF4500; }
-        .mobile-menu { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10,10,10,0.98); z-index: 999; flex-direction: column; align-items: center; justify-content: center; gap: 2.5rem; }
-        .mobile-menu.open { display: flex; }
-        .mobile-menu .nav-link { font-size: 2rem; letter-spacing: 4px; }
+        .hamburger { display: none; background: none; border: none; cursor: pointer; color: #f0f0f0; padding: 4px; z-index: 1001; align-items: center; justify-content: center; }
+
+        /* MOBILE MENU OVERLAY */
+        .mobile-menu {
+          display: none;
+          position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(10,10,10,0.98);
+          z-index: 999;
+          flex-direction: column; align-items: center; justify-content: center; gap: 2rem;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+        .mobile-menu.open { display: flex; opacity: 1; }
+        .mobile-menu .nav-link { font-size: 2rem; letter-spacing: 4px; color: #f0f0f0; }
+        .mobile-menu .nav-link:hover { color: #FF4500; }
+
+        /* BUTTONS */
         .btn-primary { background: #FF4500; color: white; border: none; padding: 14px 36px; font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 3px; cursor: pointer; clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); transition: background 0.2s, transform 0.1s; }
         .btn-primary:hover { background: #e03d00; transform: translateY(-2px); }
         .btn-outline { background: transparent; color: #f0f0f0; border: 1px solid #444; padding: 13px 35px; font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 3px; cursor: pointer; clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); transition: border-color 0.2s, color 0.2s; }
         .btn-outline:hover { border-color: #FF4500; color: #FF4500; }
+
+        /* CARDS */
         .class-card { background: #111; border: 1px solid #1e1e1e; padding: 2rem; transition: border-color 0.3s, transform 0.3s; position: relative; overflow: hidden; }
         .class-card::before { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: var(--accent); transform: scaleX(0); transition: transform 0.3s; transform-origin: left; }
         .class-card:hover { transform: translateY(-6px); border-color: #333; }
@@ -181,30 +208,44 @@ export default function Landing() {
         .plan-card { background: #111; border: 1px solid #1e1e1e; padding: 2.5rem 2rem; transition: transform 0.3s; position: relative; }
         .plan-card.highlight { border-color: #FF4500; background: #130800; }
         .plan-card:hover { transform: translateY(-6px); }
+
+        /* STATS */
         .stat-item { text-align: center; padding: 2rem 1rem; border-right: 1px solid #1e1e1e; }
         .stat-item:last-child { border-right: none; }
         .stats-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); }
+
+        /* GRIDS */
         .nosotros-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center; }
         .nosotros-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         .clases-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
         .planes-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
         .contacto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+
+        /* MISC */
         .noise-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0.4; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); }
         .section-tag { font-family: 'Inter', sans-serif; font-size: 0.7rem; font-weight: 600; letter-spacing: 4px; color: #FF4500; text-transform: uppercase; margin-bottom: 1rem; }
         .divider-line { width: 60px; height: 3px; background: #FF4500; margin: 1rem 0 2rem; }
+        .contact-input { width: 100%; background: #0a0a0a; border: 1px solid #222; color: #f0f0f0; padding: 12px 16px; margin-bottom: 1rem; font-family: 'Inter', sans-serif; font-size: 0.9rem; outline: none; display: block; transition: border-color 0.2s; }
+        .contact-input:focus { border-color: #FF4500; }
+
+        /* ANIMATIONS */
         @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
         .ticker-inner { animation: ticker 20s linear infinite; display: flex; white-space: nowrap; align-items: center; }
+        @keyframes ecg-wave { from { transform: translateX(-280px); } to { transform: translateX(140px); } }
+
+        /* SCROLLBAR */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: #0a0a0a; }
         ::-webkit-scrollbar-thumb { background: #FF4500; }
-        .contact-input { width: 100%; background: #0a0a0a; border: 1px solid #222; color: #f0f0f0; padding: 12px 16px; margin-bottom: 1rem; font-family: 'Inter', sans-serif; font-size: 0.9rem; outline: none; display: block; transition: border-color 0.2s; }
-        .contact-input:focus { border-color: #FF4500; }
-        .hamburger { display: none; background: none; border: none; cursor: pointer; color: #f0f0f0; padding: 4px; z-index: 1001; }
-        @keyframes ecg-wave { from { transform: translateX(-280px); } to { transform: translateX(140px); } }
+
+        /* ECG PULSE */
         .ecg-pulse { width: 140px; height: 45px; display: inline-block; margin-left: 16px; margin-bottom: 8px; vertical-align: middle; overflow: hidden; position: relative; }
         .ecg-pulse::before { content: ''; display: block; width: 280px; height: 100%; position: absolute; left: 0; top: 0; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 45"><polyline points="0,22 8,22 12,8 16,36 20,22 28,22 36,22 44,22 52,10 56,34 60,22 68,22 76,22 84,22 92,12 96,32 100,22 108,22 120,22 130,22 140,10 148,34 156,22 164,22 180,22 190,22 200,14 208,30 216,22 224,22 240,22 250,22 260,16 268,28 276,22 280,22" stroke="%23FF4500" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'); background-repeat: repeat-x; background-position: 0 center; background-size: 280px 100%; animation: ecg-wave 3.8s linear infinite; filter: drop-shadow(0 0 4px rgba(255,69,0,0.6)); }
+
         .hero-price-badge { position: absolute; bottom: 140px; right: 40px; z-index: 10; }
+
+        /* ===== TABLET ===== */
         @media (max-width: 1024px) {
           .planes-grid { grid-template-columns: repeat(2, 1fr); }
           .stats-grid  { grid-template-columns: repeat(2, 1fr); }
@@ -214,16 +255,26 @@ export default function Landing() {
           .nosotros-grid { gap: 3rem; }
           .hero-price-badge { bottom: 110px; right: 30px; }
         }
+
+        /* ===== MOBILE ===== */
         @media (max-width: 768px) {
-          .nav-desktop-links, .nav-desktop-btn { display: none; }
-          .hamburger { display: flex; }
+          /* NAV responsive */
+          .site-nav { padding: 1rem 1.5rem !important; }
+          .nav-desktop-links, .nav-desktop-btn { display: none !important; }
+          .hamburger { display: flex !important; }
+
+          /* HERO */
           .hero-section { padding: 7rem 1.5rem 12rem !important; min-height: 100svh; }
           .hero-price-badge { position: static !important; display: inline-block; margin-top: 2rem; }
           .ecg-pulse { display: none; }
           .hero-buttons { flex-wrap: wrap; }
+
+          /* STATS */
           .stats-grid { grid-template-columns: repeat(2, 1fr); }
           .stat-item { border-right: none !important; border-bottom: 1px solid #1e1e1e; }
           .stat-item:nth-last-child(-n+2) { border-bottom: none; }
+
+          /* SECTIONS padding */
           .nosotros-section { padding: 4rem 1.5rem !important; }
           .nosotros-grid { grid-template-columns: 1fr; gap: 3rem; }
           .nosotros-cards { grid-template-columns: 1fr; }
@@ -234,9 +285,17 @@ export default function Landing() {
           .cta-section     { padding: 4rem 1.5rem !important; }
           .contacto-section { padding: 4rem 1.5rem !important; }
           .contacto-grid  { grid-template-columns: 1fr; gap: 2.5rem; }
+
+          /* NOTICIAS */
+          .noticias-section { padding: 4rem 1.5rem !important; }
+          .noticias-grid { grid-template-columns: 1fr !important; }
+
+          /* FOOTER */
           .footer { flex-direction: column !important; gap: 1.5rem; text-align: center; padding: 2rem 1.5rem !important; }
           .footer-social { justify-content: center; }
         }
+
+        /* ===== SMALL MOBILE ===== */
         @media (max-width: 400px) {
           .planes-grid   { grid-template-columns: 1fr; }
           .nosotros-cards { grid-template-columns: 1fr; }
@@ -255,7 +314,7 @@ export default function Landing() {
       </div>
 
       {/* NAV */}
-      <nav style={{
+      <nav className="site-nav" style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000,
         padding: "1.2rem 4rem",
         background: scrolled ? "rgba(10,10,10,0.95)" : "transparent",
@@ -282,7 +341,6 @@ export default function Landing() {
         minHeight: "100vh", display: "flex", alignItems: "center", flexDirection: "column", justifyContent: "center",
         position: "relative", overflow: "hidden",
       }}>
-        {/* Foto de fondo con hover translate */}
         <div
           onMouseMove={(e) => {
             const { clientX, clientY, currentTarget } = e;
@@ -303,12 +361,9 @@ export default function Landing() {
             filter: "brightness(0.3)", transition: "transform 0.4s ease", transform: "scale(1.05)",
           }} />
         </div>
-        {/* Overlay */}
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(120deg, rgba(255,69,0,0.3) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.65) 100%)" }} />
-        {/* Glow */}
         <div style={{ position: "absolute", left: "-5%", top: "20%", width: 500, height: 500, background: "radial-gradient(circle, rgba(255,69,0,0.18) 0%, transparent 70%)", pointerEvents: "none" }} />
 
-        {/* Contenido hero */}
         <div style={{ position: "relative", maxWidth: 780, width: "100%" }}>
           <div className="section-tag" style={{ opacity: 0, animation: "fadeUp 0.6s ease 0.1s forwards" }}>
             Gimnasio · Porteña, Córdoba
@@ -407,7 +462,7 @@ export default function Landing() {
       </section>
 
       {/* NOTICIAS */}
-      <section id="noticias" style={{ padding: "8rem 4rem", background: "#0a0a0a" }}>
+      <section id="noticias" className="noticias-section" style={{ padding: "8rem 4rem", background: "#0a0a0a" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <FadeSection style={{ textAlign: "center", marginBottom: "4rem" }}>
             <div className="section-tag" style={{ textAlign: "center" }}>Actualidad</div>
@@ -415,40 +470,40 @@ export default function Landing() {
             <div className="divider-line" style={{ margin: "1rem auto 2rem" }} />
           </FadeSection>
 
-          <div style={{ 
-            display: "grid", 
-            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", 
-            gap: "2rem" 
+          <div className="noticias-grid" style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+            gap: "2rem"
           }}>
             {noticias.length === 0 ? (
               <p style={{ gridColumn: "1 / -1", textAlign: "center", color: "#666", fontFamily: "'Inter', sans-serif" }}>No hay noticias recientes para mostrar en este momento.</p>
             ) : noticias.map((noticia, i) => (
               <FadeSection key={noticia.id} delay={i * 0.1}>
-                <div style={{ 
-                  background: "#1a1a1a", 
-                  border: "1px solid #222", 
-                  borderRadius: "8px", 
-                  overflow: "hidden", 
+                <div style={{
+                  background: "#1a1a1a",
+                  border: "1px solid #222",
+                  borderRadius: "8px",
+                  overflow: "hidden",
                   height: "100%",
                   transition: "transform 0.3s, border-color 0.3s",
                   cursor: "default"
-                }} 
+                }}
                 onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-10px)"; e.currentTarget.style.borderColor = "#FF4500"; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.borderColor = "#222"; }}
                 >
                   <div style={{ height: "220px", overflow: "hidden" }}>
-                    <img 
-                      src={noticia.imagen} 
-                      alt={noticia.titulo} 
+                    <img
+                      src={noticia.imagen}
+                      alt={noticia.titulo}
                       style={{ width: "100%", height: "100%", objectFit: "cover" }}
                     />
                   </div>
                   <div style={{ padding: "1.5rem" }}>
-                    <div style={{ 
-                      fontFamily: "'Inter', sans-serif", 
-                      fontSize: "0.75rem", 
-                      color: "#FF4500", 
-                      marginBottom: "0.5rem", 
+                    <div style={{
+                      fontFamily: "'Inter', sans-serif",
+                      fontSize: "0.75rem",
+                      color: "#FF4500",
+                      marginBottom: "0.5rem",
                       fontWeight: 600,
                       display: "flex",
                       alignItems: "center",
@@ -457,28 +512,28 @@ export default function Landing() {
                       <Calendar size={12} />
                       {new Date(noticia.fecha).toLocaleDateString('es-AR')}
                     </div>
-                    <h3 style={{ 
-                      fontFamily: "'Bebas Neue', sans-serif", 
-                      fontSize: "1.8rem", 
-                      marginBottom: "1rem", 
+                    <h3 style={{
+                      fontFamily: "'Bebas Neue', sans-serif",
+                      fontSize: "1.8rem",
+                      marginBottom: "1rem",
                       lineHeight: 1.1,
                       letterSpacing: "1px"
                     }}>{noticia.titulo}</h3>
-                    <p style={{ 
-                      fontFamily: "'Inter', sans-serif", 
-                      fontSize: "0.9rem", 
-                      color: "#888", 
+                    <p style={{
+                      fontFamily: "'Inter', sans-serif",
+                      fontSize: "0.9rem",
+                      color: "#888",
                       lineHeight: 1.6,
                       marginBottom: "1.5rem"
                     }}>
-                      {noticia.contenido.length > 120 
-                        ? noticia.contenido.substring(0, 120) + '...' 
+                      {noticia.contenido.length > 120
+                        ? noticia.contenido.substring(0, 120) + '...'
                         : noticia.contenido}
                     </p>
-                    <div style={{ 
-                      fontFamily: "'Bebas Neue', sans-serif", 
-                      color: "#FF4500", 
-                      fontSize: "1.1rem", 
+                    <div style={{
+                      fontFamily: "'Bebas Neue', sans-serif",
+                      color: "#FF4500",
+                      fontSize: "1.1rem",
                       letterSpacing: "1px",
                       display: "flex",
                       alignItems: "center",
