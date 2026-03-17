@@ -185,7 +185,7 @@ export default function Landing() {
           display: none;
           position: fixed; top: 0; left: 0; right: 0; bottom: 0;
           background: rgba(10,10,10,0.98);
-          z-index: 999;
+          z-index: 1100;
           flex-direction: column; align-items: center; justify-content: center; gap: 2rem;
           opacity: 0;
           transition: opacity 0.3s ease;
