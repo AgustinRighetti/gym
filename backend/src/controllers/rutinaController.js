@@ -6,7 +6,7 @@ async function getRutinasPorSocio(req, res) {
     const { socioId } = req.params;
 
     const rutinas = await prisma.rutina.findMany({
-      where: { socioId: parseInt(socioId) },
+      where: { socios: { some: { socioId: parseInt(socioId) } } },
       include: {
         ejercicios: {
           include: {
@@ -47,7 +47,7 @@ async function createRutina(req, res) {
       data: {
         nombre,
         descripcion: descripcion || null,
-        socioId: parseInt(socioId),
+        socios: { create: { socioId: parseInt(socioId) } },
         ejercicios: {
           create: ejercicios && ejercicios.length > 0 ? ejercicios.map(e => ({
             ejercicioId: parseInt(e.ejercicioId),
@@ -80,7 +80,7 @@ async function getRutinaById(req, res) {
     const rutina = await prisma.rutina.findUnique({
       where: { id: parseInt(id) },
       include: {
-        socio: true,
+        socios: { include: { socio: true } },
         ejercicios: {
           include: { ejercicio: true },
           orderBy: { diaSemana: 'asc' }
