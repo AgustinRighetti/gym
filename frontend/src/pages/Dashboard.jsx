@@ -123,7 +123,7 @@ export default function Dashboard() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSocio(data);
-      setPlanSeleccionado(data.plan);
+      setPlanSeleccionado(data.plan?.codigo);
     } catch {
       setError('Error al cargar información del socio');
     } finally {
@@ -151,7 +151,7 @@ export default function Dashboard() {
       const anioActual = ahora.getFullYear();
       const thisWeek = data.filter(a => a.semana === semanaActual && a.anio === anioActual);
       const LIMITE = { UN_DIA: 1, DOS_DIAS: 2, TRES_DIAS: 3, LIBRE: null };
-      setAsistenciaSemana({ diasUsados: thisWeek.length, limite: LIMITE[socioData.plan] ?? null });
+      setAsistenciaSemana({ diasUsados: thisWeek.length, limite: LIMITE[socioData.plan?.codigo] ?? null });
     } catch { /* no crítico */ }
     finally { setAsistenciasLoading(false); }
   }, [token]);
@@ -179,7 +179,7 @@ export default function Dashboard() {
   const handleLogout = () => { logout(); navigate('/'); };
 
   const handleCambiarPlan = async () => {
-    if (!planSeleccionado || planSeleccionado === socio?.plan) return;
+    if (!planSeleccionado || planSeleccionado === socio?.plan?.codigo) return;
     setPlanLoading(true);
     setPlanMsg({ tipo: '', texto: '' });
     try {
@@ -321,11 +321,11 @@ export default function Dashboard() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
                 <p style={{ fontSize: '0.78rem', color: '#999', margin: '0 0 0.25rem', fontWeight: 500 }}>Membresía</p>
-                <p style={{ fontSize: '1.3rem', margin: 0, fontWeight: 'bold', color: '#FF4500' }}>{socio?.plan}</p>
+                <p style={{ fontSize: '1.3rem', margin: 0, fontWeight: 'bold', color: '#FF4500' }}>{socio?.plan?.nombre || socio?.plan?.codigo}</p>
               </div>
               <div>
                 <p style={{ fontSize: '0.78rem', color: '#999', margin: '0 0 0.25rem', fontWeight: 500 }}>Precio Mensual</p>
-                <p style={{ fontSize: '1.2rem', margin: 0, fontWeight: 600 }}>{planPrecio[socio?.plan]}</p>
+                <p style={{ fontSize: '1.2rem', margin: 0, fontWeight: 600 }}>{planPrecio[socio?.plan?.codigo]}</p>
               </div>
             </div>
           </div>
@@ -402,11 +402,11 @@ export default function Dashboard() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.2rem', flexWrap: 'wrap' }}>
             <span style={{ fontSize: '0.85rem', color: '#777' }}>Plan actual:</span>
             <span style={{ background: '#FF450020', color: '#FF4500', padding: '0.3rem 0.75rem', borderRadius: '4px', fontWeight: 700, fontSize: '0.85rem', letterSpacing: '1px' }}>
-              {PLANES.find(p => p.value === socio?.plan)?.label || socio?.plan}
+              {PLANES.find(p => p.value === socio?.plan?.codigo)?.label || socio?.plan?.nombre}
             </span>
             {socio?.planPendiente && (
               <span style={{ background: '#FF4500', color: '#fff', padding: '0.3rem 0.75rem', borderRadius: '4px', fontWeight: 700, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <RefreshCw size={12} /> Cambio a {PLANES.find(p => p.value === socio.planPendiente)?.label || socio.planPendiente} en renovación
+                <RefreshCw size={12} /> Cambio a {PLANES.find(p => p.value === socio.planPendiente?.codigo)?.label || socio.planPendiente?.nombre} en renovación
               </span>
             )}
           </div>
@@ -426,8 +426,8 @@ export default function Dashboard() {
           {/* Selector planes */}
           <div className="planes-row">
             {PLANES.map(p => {
-              const esActual = p.value === socio?.plan;
-              const esPendiente = p.value === socio?.planPendiente;
+              const esActual = p.value === socio?.plan?.codigo;
+              const esPendiente = p.value === socio?.planPendiente?.codigo;
               const seleccionado = p.value === planSeleccionado;
               const bloqueado = !!socio?.planPendiente || esActual;
               return (
@@ -456,14 +456,14 @@ export default function Dashboard() {
 
           <button
             onClick={handleCambiarPlan}
-            disabled={planLoading || !!socio?.planPendiente || planSeleccionado === socio?.plan}
+            disabled={planLoading || !!socio?.planPendiente || planSeleccionado === socio?.plan?.codigo}
             style={{
               marginTop: '1.2rem', width: '100%', padding: '0.85rem',
-              background: (planLoading || !!socio?.planPendiente || planSeleccionado === socio?.plan) ? '#333' : '#FF4500',
-              color: (planLoading || !!socio?.planPendiente || planSeleccionado === socio?.plan) ? '#666' : '#fff',
+              background: (planLoading || !!socio?.planPendiente || planSeleccionado === socio?.plan?.codigo) ? '#333' : '#FF4500',
+              color: (planLoading || !!socio?.planPendiente || planSeleccionado === socio?.plan?.codigo) ? '#666' : '#fff',
               border: 'none', borderRadius: '4px',
               fontFamily: "'Bebas Neue', sans-serif", fontSize: '1rem', letterSpacing: '2px',
-              cursor: (planLoading || !!socio?.planPendiente || planSeleccionado === socio?.plan) ? 'not-allowed' : 'pointer',
+              cursor: (planLoading || !!socio?.planPendiente || planSeleccionado === socio?.plan?.codigo) ? 'not-allowed' : 'pointer',
               transition: 'all 0.2s',
             }}
           >

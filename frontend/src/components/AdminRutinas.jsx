@@ -186,7 +186,7 @@ export default function AdminRutinas({ onVolver }) {
                   onMouseEnter={e => e.currentTarget.style.background = '#222'}
                   onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                   <div style={{ color: '#fff', fontWeight: 600 }}>{s.nombre} {s.apellido}</div>
-                  <div style={{ fontSize: '0.75rem', color: '#666' }}>Plan: {s.plan}</div>
+                  <div style={{ fontSize: '0.75rem', color: '#666' }}>Plan: {s.plan?.nombre || s.plan?.codigo}</div>
                 </div>
               ))}
           </div>
@@ -202,7 +202,7 @@ export default function AdminRutinas({ onVolver }) {
             <div>
               <p style={{ color: '#FF4500', fontSize: '0.8rem', fontWeight: 700, margin: 0, textTransform: 'uppercase' }}>Socio Seleccionado</p>
               <h3 style={{ fontSize: '1.8rem', margin: '0.2rem 0', color: '#fff' }}>{socioSeleccionado.nombre} {socioSeleccionado.apellido}</h3>
-              <span style={{ fontSize: '0.85rem', color: '#888' }}>Plan: {socioSeleccionado.plan}</span>
+              <span style={{ fontSize: '0.85rem', color: '#888' }}>Plan: {socioSeleccionado.plan?.nombre || socioSeleccionado.plan?.codigo}</span>
             </div>
             <button onClick={abrirModalNuevo} style={{ background: '#FF4500', color: '#fff', border: 'none', padding: '0.8rem 1.5rem', borderRadius: '4px', cursor: 'pointer', fontFamily: "'Bebas Neue', sans-serif", letterSpacing: '2px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem' }}>
               <Plus size={18} /> NUEVA RUTINA
