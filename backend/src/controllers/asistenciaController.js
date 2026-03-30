@@ -31,6 +31,7 @@ async function registrarAsistenciaDNI(req, res) {
                 socio: {
                     include: {
                         pagos: { orderBy: { fecha: 'desc' }, take: 1 },
+                        plan: { select: { codigo: true } },
                     }
                 }
             }
@@ -66,7 +67,7 @@ async function registrarAsistenciaDNI(req, res) {
             where: { socioId: socio.id, semana, anio },
         });
 
-        const limite = PLAN_LIMITE[socio.plan];
+        const limite = PLAN_LIMITE[socio.plan?.codigo];
         const excedio = limite !== null && asistenciasSemana >= limite;
 
         // Registrar asistencia siempre (con o sin alerta)
@@ -114,7 +115,7 @@ async function getAsistenciasSocio(req, res) {
         const asistencias = await prisma.asistencia.findMany({
             where: { socioId },
             orderBy: { fecha: 'desc' },
-            include: { socio: { select: { nombre: true, apellido: true, plan: true } } },
+            include: { socio: { select: { nombre: true, apellido: true, plan: { select: { codigo: true, nombre: true } } } } },
         });
 
         res.json(asistencias);
@@ -153,7 +154,7 @@ async function getAsistenciasSemana(req, res) {
                         id: true,
                         nombre: true,
                         apellido: true,
-                        plan: true,
+                        plan: { select: { codigo: true, nombre: true } },
                     },
                 },
             },
@@ -167,7 +168,7 @@ async function getAsistenciasSemana(req, res) {
                 resumen[key] = {
                     socio: a.socio,
                     diasUsados: 0,
-                    limite: PLAN_LIMITE[a.socio.plan],
+                    limite: PLAN_LIMITE[a.socio.plan?.codigo],
                     ultimaVisita: a.fecha,
                     tieneAlerta: false,
                     asistencias: [],
