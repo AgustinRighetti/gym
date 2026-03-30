@@ -402,11 +402,11 @@ export default function Dashboard() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.2rem', flexWrap: 'wrap' }}>
             <span style={{ fontSize: '0.85rem', color: '#777' }}>Plan actual:</span>
             <span style={{ background: '#FF450020', color: '#FF4500', padding: '0.3rem 0.75rem', borderRadius: '4px', fontWeight: 700, fontSize: '0.85rem', letterSpacing: '1px' }}>
-              {PLANES.find(p => p.value === socio?.plan)?.label || socio?.plan}
+              {PLANES.find(p => p.value === socio?.plan?.codigo)?.label || socio?.plan?.nombre || 'Sin plan'}
             </span>
             {socio?.planPendiente && (
               <span style={{ background: '#FF4500', color: '#fff', padding: '0.3rem 0.75rem', borderRadius: '4px', fontWeight: 700, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <RefreshCw size={12} /> Cambio a {PLANES.find(p => p.value === socio.planPendiente)?.label || socio.planPendiente} en renovación
+                <RefreshCw size={12} /> Cambio a {PLANES.find(p => p.value === socio?.planPendiente?.codigo)?.label || socio?.planPendiente?.nombre} en renovación
               </span>
             )}
           </div>

@@ -164,7 +164,7 @@ export default function Admin() {
 
   const toggleExpand = (socioId, currentPlan) => {
     setExpandedSocioId(prev => prev === socioId ? null : socioId);
-    if (!planSelects[socioId]) setPlanSelects(p => ({ ...p, [socioId]: currentPlan }));
+    if (!planSelects[socioId]) setPlanSelects(p => ({ ...p, [socioId]: currentPlan?.codigo || currentPlan }));
   };
 
   const handleLogout = () => { logout(); navigate('/'); };
@@ -411,7 +411,7 @@ export default function Admin() {
                           <>
                             <tr key={socio.id}
                               style={{ borderBottom: isExpanded ? 'none' : '1px solid #2a2a2a', background: isExpanded ? '#161616' : '#0a0a0a', cursor: 'pointer', transition: 'background 0.2s' }}
-                              onClick={() => toggleExpand(socio.id, socio.plan)}
+                              onClick={() => toggleExpand(socio.id, socio.plan?.codigo)}
                               onMouseEnter={e => { if (!isExpanded) e.currentTarget.style.background = '#141414'; }}
                               onMouseLeave={e => { if (!isExpanded) e.currentTarget.style.background = '#0a0a0a'; }}>
                               <td style={{ padding: '0.9rem 0.75rem', color: '#555' }}>{isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}</td>
@@ -420,11 +420,11 @@ export default function Admin() {
                               <td style={{ padding: '0.9rem 0.75rem' }}>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                                   <span style={{ display: 'inline-block', padding: '0.25rem 0.55rem', background: '#FF450020', color: '#FF4500', borderRadius: '4px', fontWeight: 600, fontSize: '0.8rem', width: 'fit-content' }}>
-                                    {PLANES.find(p => p.value === socio.plan)?.label || socio.plan}
+                                    {PLANES.find(p => p.value === socio.plan?.codigo)?.label || socio.plan?.nombre || 'Sin plan'}
                                   </span>
                                   {socio.planPendiente && (
                                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', padding: '0.2rem 0.5rem', background: '#FF4500', color: '#fff', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 700, width: 'fit-content' }}>
-                                      <RefreshCw size={10} /> {PLANES.find(p => p.value === socio.planPendiente)?.label}
+                                      <RefreshCw size={10} /> {PLANES.find(p => p.value === socio.planPendiente?.codigo)?.label || socio.planPendiente?.nombre}
                                     </span>
                                   )}
                                 </div>
@@ -485,15 +485,15 @@ export default function Admin() {
                           <span style={{ display: 'inline-block', padding: '0.3rem 0.7rem', background: estadoColor[estadoPago], color: '#000', borderRadius: '20px', fontSize: '0.72rem', fontWeight: 'bold', whiteSpace: 'nowrap', marginLeft: '0.5rem' }}>{estadoPago}</span>
                         </div>
                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.9rem', alignItems: 'center' }}>
-                          <span style={{ padding: '0.25rem 0.55rem', background: '#FF450020', color: '#FF4500', borderRadius: '4px', fontWeight: 600, fontSize: '0.78rem' }}>{PLANES.find(p => p.value === socio.plan)?.label || socio.plan}</span>
-                          {socio.planPendiente && <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', padding: '0.2rem 0.5rem', background: '#FF4500', color: '#fff', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 700 }}><RefreshCw size={10} /> {PLANES.find(p => p.value === socio.planPendiente)?.label}</span>}
+                          <span style={{ padding: '0.25rem 0.55rem', background: '#FF450020', color: '#FF4500', borderRadius: '4px', fontWeight: 600, fontSize: '0.78rem' }}>{PLANES.find(p => p.value === socio.plan?.codigo)?.label || socio.plan?.nombre || 'Sin plan'}</span>
+                          {socio.planPendiente && <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', padding: '0.2rem 0.5rem', background: '#FF4500', color: '#fff', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 700 }}><RefreshCw size={10} /> {PLANES.find(p => p.value === socio.planPendiente?.codigo)?.label || socio.planPendiente?.nombre}</span>}
                           {lastPago && <span style={{ fontSize: '0.75rem', color: '#666' }}>Vence: {new Date(lastPago.vencimiento).toLocaleDateString('es-AR')}</span>}
                         </div>
                         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                           {(estadoPago === 'PENDIENTE' || estadoPago === 'VENCIDO') && (
                             <button onClick={() => handleMarcarPagado(socio.id)} style={{ flex: 1, padding: '0.55rem', background: '#22c55e', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.82rem' }}>Marcar pagado</button>
                           )}
-                          <button onClick={() => toggleExpand(socio.id, socio.plan)} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', padding: '0.55rem', background: 'transparent', color: '#FF4500', border: '1px solid #FF450060', borderRadius: '4px', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 600 }}>
+                          <button onClick={() => toggleExpand(socio.id, socio.plan?.codigo)} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', padding: '0.55rem', background: 'transparent', color: '#FF4500', border: '1px solid #FF450060', borderRadius: '4px', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 600 }}>
                             <RefreshCw size={13} /> {isExpanded ? 'Ocultar plan' : 'Gestionar plan'}
                           </button>
                           <button onClick={() => setDeleteModal({ show: true, socio, loading: false, error: '' })} style={{ padding: '0.55rem 0.7rem', background: 'transparent', color: '#ef4444', border: '1px solid #ef444460', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
@@ -556,7 +556,7 @@ export default function Admin() {
                         return (
                           <tr key={idx} style={{ borderBottom: '1px solid #2a2a2a', background: item.tieneAlerta ? 'rgba(255,69,0,0.05)' : 'transparent' }}>
                             <td style={{ padding: '0.9rem 0.75rem', fontWeight: 500 }}>{item.socio.nombre} {item.socio.apellido}</td>
-                            <td style={{ padding: '0.9rem 0.75rem' }}><span style={{ background: '#FF450020', color: '#FF4500', padding: '0.22rem 0.55rem', borderRadius: '4px', fontSize: '0.78rem', fontWeight: 600 }}>{PLANES.find(p => p.value === item.socio.plan)?.label || item.socio.plan}</span></td>
+                            <td style={{ padding: '0.9rem 0.75rem' }}><span style={{ background: '#FF450020', color: '#FF4500', padding: '0.22rem 0.55rem', borderRadius: '4px', fontSize: '0.78rem', fontWeight: 600 }}>{PLANES.find(p => p.value === item.socio.plan?.codigo)?.label || item.socio.plan?.nombre || 'Sin plan'}</span></td>
                             <td style={{ padding: '0.9rem 0.75rem', textAlign: 'center' }}>
                               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem' }}>
                                 <span style={{ fontWeight: 700, color: item.tieneAlerta ? '#FF4500' : '#fff' }}>{item.diasUsados} / {item.limite ?? '∞'}</span>
@@ -587,7 +587,7 @@ export default function Admin() {
                             : <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', color: '#22c55e', fontSize: '0.78rem' }}><CheckCircle size={12} /> OK</span>}
                         </div>
                         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.6rem', flexWrap: 'wrap' }}>
-                          <span style={{ background: '#FF450020', color: '#FF4500', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>{PLANES.find(p => p.value === item.socio.plan)?.label || item.socio.plan}</span>
+                          <span style={{ background: '#FF450020', color: '#FF4500', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>{PLANES.find(p => p.value === item.socio.plan?.codigo)?.label || item.socio.plan?.nombre || 'Sin plan'}</span>
                           <span style={{ fontSize: '0.78rem', color: item.tieneAlerta ? '#FF4500' : '#aaa', fontWeight: 700 }}>{item.diasUsados} / {item.limite ?? '∞'} días</span>
                         </div>
                         {item.limite && <div style={{ height: 5, background: '#333', borderRadius: 3, overflow: 'hidden', marginBottom: '0.5rem' }}><div style={{ width: `${pct * 100}%`, height: '100%', background: item.tieneAlerta ? '#FF4500' : '#22c55e', borderRadius: 3 }} /></div>}
@@ -868,12 +868,12 @@ function PlanManager({ socio, planSelects, planLoadings, planMsgs, setPlanSelect
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', minWidth: 150 }}>
           <span style={{ fontSize: '0.72rem', color: '#666', letterSpacing: 1, textTransform: 'uppercase' }}>Plan actual</span>
           <span style={{ background: '#FF450020', color: '#FF4500', padding: '0.35rem 0.7rem', borderRadius: '4px', fontSize: '0.85rem', fontWeight: 700, width: 'fit-content' }}>
-            {PLANES.find(p => p.value === socio.plan)?.label} — {getPlanPrecio(socio.plan)}
+            {PLANES.find(p => p.value === socio.plan?.codigo)?.label || socio.plan?.nombre || 'Sin plan'} — {getPlanPrecio(socio.plan?.codigo)}
           </span>
           {socio.planPendiente && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', background: '#FF4500', color: '#fff', padding: '0.35rem 0.7rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 700, width: 'fit-content' }}>
-                <RefreshCw size={11} /> Cambio a {PLANES.find(p => p.value === socio.planPendiente)?.label} pendiente
+                <RefreshCw size={11} /> Cambio a {PLANES.find(p => p.value === socio.planPendiente?.codigo)?.label || socio.planPendiente?.nombre} pendiente
               </span>
               <button onClick={e => { e.stopPropagation(); handleCancelarPlan(socio.id); }} disabled={planLoadings[socio.id]}
                 style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', padding: '0.35rem 0.7rem', background: 'transparent', border: '1px solid #ef4444', borderRadius: '4px', color: '#ef4444', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600, width: 'fit-content' }}>
@@ -889,13 +889,13 @@ function PlanManager({ socio, planSelects, planLoadings, planMsgs, setPlanSelect
               <button key={p.value} onClick={e => { e.stopPropagation(); setPlanSelects(prev => ({ ...prev, [socio.id]: p.value })); }}
                 style={{ padding: '0.5rem 0.7rem', borderRadius: '4px', fontSize: '0.82rem', fontWeight: 600, background: planSelects[socio.id] === p.value ? '#FF450020' : '#0a0a0a', border: `2px solid ${planSelects[socio.id] === p.value ? '#FF4500' : '#333'}`, color: planSelects[socio.id] === p.value ? '#FF4500' : '#aaa', cursor: 'pointer', transition: 'all 0.15s' }}>
                 {p.label} <span style={{ opacity: 0.6, fontSize: '0.75rem' }}>{p.precio}</span>
-                {p.value === socio.plan && <span style={{ fontSize: '0.68rem', opacity: 0.45, marginLeft: '0.25rem' }}>(actual)</span>}
+                {p.value === socio.plan?.codigo && <span style={{ fontSize: '0.68rem', opacity: 0.45, marginLeft: '0.25rem' }}>(actual)</span>}
               </button>
             ))}
           </div>
           <button onClick={e => { e.stopPropagation(); handleProgramarPlan(socio.id); }}
-            disabled={planLoadings[socio.id] || !planSelects[socio.id] || planSelects[socio.id] === socio.plan}
-            style={{ padding: '0.55rem 1.1rem', background: (planLoadings[socio.id] || !planSelects[socio.id] || planSelects[socio.id] === socio.plan) ? '#333' : '#FF4500', color: (planLoadings[socio.id] || !planSelects[socio.id] || planSelects[socio.id] === socio.plan) ? '#666' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontFamily: "'Bebas Neue', sans-serif", fontSize: '0.9rem', letterSpacing: '2px', transition: 'all 0.2s' }}>
+            disabled={planLoadings[socio.id] || !planSelects[socio.id] || planSelects[socio.id] === socio.plan?.codigo}
+            style={{ padding: '0.55rem 1.1rem', background: (planLoadings[socio.id] || !planSelects[socio.id] || planSelects[socio.id] === socio.plan?.codigo) ? '#333' : '#FF4500', color: (planLoadings[socio.id] || !planSelects[socio.id] || planSelects[socio.id] === socio.plan?.codigo) ? '#666' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontFamily: "'Bebas Neue', sans-serif", fontSize: '0.9rem', letterSpacing: '2px', transition: 'all 0.2s' }}>
             {planLoadings[socio.id] ? 'Procesando...' : 'Programar Cambio →'}
           </button>
         </div>
