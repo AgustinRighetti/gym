@@ -380,7 +380,7 @@ export default function Landing() {
             Sala de musculación completa + clases funcionales grupales. Entrenadores certificados.
           </p>
           <div className="hero-buttons" style={{ display: "flex", gap: "1rem", opacity: 0, animation: "fadeUp 0.7s ease 1.9s forwards" }}>
-            <button className="btn-primary" onClick={() => scrollTo("planes")}>Registrarme →</button>
+            <button className="btn-primary" onClick={() => scrollTo("planes")}>Registrarse→</button>
             <button className="btn-outline" onClick={() => scrollTo("clases")}>Ver clases</button>
           </div>
           <div className="hero-price-badge" style={{ background: "#FF4500", padding: "1.5rem", clipPath: "polygon(0 15%, 15% 0, 100% 0, 100% 85%, 85% 100%, 0 100%)", opacity: 0, animation: "fadeUp 0.7s ease 2.1s forwards" }}>

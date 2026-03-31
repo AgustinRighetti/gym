@@ -321,11 +321,11 @@ export default function Dashboard() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
                 <p style={{ fontSize: '0.78rem', color: '#999', margin: '0 0 0.25rem', fontWeight: 500 }}>Membresía</p>
-                <p style={{ fontSize: '1.3rem', margin: 0, fontWeight: 'bold', color: '#FF4500' }}>{socio?.plan}</p>
+                <p style={{ fontSize: '1.3rem', margin: 0, fontWeight: 'bold', color: '#FF4500' }}>{socio?.plan?.nombre}</p>
               </div>
               <div>
                 <p style={{ fontSize: '0.78rem', color: '#999', margin: '0 0 0.25rem', fontWeight: 500 }}>Precio Mensual</p>
-                <p style={{ fontSize: '1.2rem', margin: 0, fontWeight: 600 }}>{planPrecio[socio?.plan]}</p>
+                <p style={{ fontSize: '1.2rem', margin: 0, fontWeight: 600 }}>{planPrecio[socio?.plan?.codigo]}</p>
               </div>
             </div>
           </div>
@@ -426,8 +426,8 @@ export default function Dashboard() {
           {/* Selector planes */}
           <div className="planes-row">
             {PLANES.map(p => {
-              const esActual = p.value === socio?.plan;
-              const esPendiente = p.value === socio?.planPendiente;
+              const esActual = p.value === socio?.plan?.codigo;
+              const esPendiente = p.value === socio?.planPendiente?.codigo;
               const seleccionado = p.value === planSeleccionado;
               const bloqueado = !!socio?.planPendiente || esActual;
               return (

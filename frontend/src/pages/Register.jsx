@@ -47,7 +47,8 @@ export default function Register() {
         email: email || undefined,
         password,
         telefono: telefono || undefined,
-        plan, rol: 'SOCIO',
+        plan: plan?.codigo,
+        rol: 'SOCIO',
       });
       login(data.token, data.user);
       navigate(data.user.rol === 'ADMIN' ? '/admin' : '/dashboard', { replace: true });

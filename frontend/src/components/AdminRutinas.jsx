@@ -186,7 +186,7 @@ export default function AdminRutinas({ onVolver }) {
                   onMouseEnter={e => e.currentTarget.style.background = '#222'}
                   onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                   <div style={{ color: '#fff', fontWeight: 600 }}>{s.nombre} {s.apellido}</div>
-                  <div style={{ fontSize: '0.75rem', color: '#666' }}>Plan: {s.plan?.nombre || s.plan?.codigo || 'Sin plan'}</div>
+                  <div style={{ fontSize: '0.75rem', color: '#666' }}>Plan: {socioSeleccionado.plan?.nombre || socioSeleccionado.plan?.codigo || 'Sin plan'}</div>
                 </div>
               ))}
           </div>
