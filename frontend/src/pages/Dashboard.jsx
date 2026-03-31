@@ -123,7 +123,7 @@ export default function Dashboard() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSocio(data);
-      setPlanSeleccionado(data.plan);
+      setPlanSeleccionado(data.plan?.codigo || ''); // Ensure plan is accessed safely
     } catch {
       setError('Error al cargar información del socio');
     } finally {
@@ -151,7 +151,7 @@ export default function Dashboard() {
       const anioActual = ahora.getFullYear();
       const thisWeek = data.filter(a => a.semana === semanaActual && a.anio === anioActual);
       const LIMITE = { UN_DIA: 1, DOS_DIAS: 2, TRES_DIAS: 3, LIBRE: null };
-      setAsistenciaSemana({ diasUsados: thisWeek.length, limite: LIMITE[socioData.plan] ?? null });
+      setAsistenciaSemana({ diasUsados: thisWeek.length, limite: LIMITE[socioData.plan?.codigo] ?? null }); // Ensure plan is accessed safely
     } catch { /* no crítico */ }
     finally { setAsistenciasLoading(false); }
   }, [token]);

@@ -20,10 +20,12 @@ export default function Register() {
 
   const planParam = searchParams.get('plan')?.toUpperCase();
   const plan = VALID_PLANS.includes(planParam) ? planParam : null;
+  // Ensure plan is an object with expected keys
+  const planObject = plan ? PLAN_LABELS[plan] : null;
 
   useEffect(() => {
-    if (!plan) navigate('/#planes', { replace: true });
-  }, [plan, navigate]);
+    if (!planObject) navigate('/#planes', { replace: true });
+  }, [planObject, navigate]);
 
   const [dni, setDni]           = useState('');
   const [nombre, setNombre]     = useState('');
@@ -56,9 +58,9 @@ export default function Register() {
     }
   };
 
-  if (!plan) return null;
+  if (!planObject) return null;
 
-  const planInfo = PLAN_LABELS[plan];
+  const planInfo = planObject;
 
   const inputStyle = {
     width: '100%',
